@@ -8,7 +8,8 @@ Pipeline {
   stages {
     stage('Checkout') {
       steps {
-        git branch: 'main', url: 'https://github.com/Doom710/hosting_test'
+        sh 'echo"Checkout Successfull"'
+        //git branch: 'main', url: 'https://github.com/Doom710/hosting_test'
       }
     }
 
@@ -32,7 +33,7 @@ Pipeline {
 
     stage('Build and Push Docker Image') {
       environment {
-        DOCKER_IMAGE = "your-docker-hub-username/static-website:${BUILD_NUMBER}"
+        DOCKER_IMAGE = "aaronsbinu/static-website:${BUILD_NUMBER}"
         REGISTRY_CREDENTIALS = credentials('docker-cred')
       }
       steps {
@@ -51,17 +52,17 @@ Pipeline {
     stage('Update Deployment File') {
         environment {
             GIT_REPO_NAME = "hosting_test"
-            GIT_USER_NAME = "Doom710"
+            GIT_USER_NAME = "MRODOM12"
         }
         steps {
             withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
                 sh '''
-                    git config user.email "xyz@gmail.com"
+                    git config user.email "aaronsbinumattom@gmail.com"
                     git config user.name "${GIT_USER_NAME}"
                     
-                    sed -i "s|image: .*|image: your-docker-hub-username/static-website:${BUILD_NUMBER}|g" k8s/deployment.yml
+                    sed -i "s|image: .*|image: aaronsbinu/static-website:${BUILD_NUMBER}|g" K8s/deployment.yml
                     
-                    git add k8s/deployment.yml
+                    git add K8s/deployment.yml
                     git commit -m "Update static site image tag to ${BUILD_NUMBER} [skip ci]" || echo "No changes to commit"
                     git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
                 '''
